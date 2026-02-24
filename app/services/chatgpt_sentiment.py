@@ -11,7 +11,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 async def analyze_sentiment(feedback_text: str) -> dict:
     """
-    Analyze sentiment of customer feedback using ChatGPT.
+    Analyze the sentiment of customer feedback using ChatGPT.
 
     This function sends the feedback to ChatGPT and asks it to determine
     if the sentiment is positive, negative, neutral, or mixed.
@@ -25,14 +25,9 @@ async def analyze_sentiment(feedback_text: str) -> dict:
             'confidence': float,  # How confident the AI is (0-1)
             'reasoning': str  # Why the AI chose this sentiment
         }
-
-    Example:
-        >>> result = await analyze_sentiment("Great product but slow delivery")
-        >>> print(result['sentiment'])
-        'mixed'
     """
 
-    # Create a prompt that tells ChatGPT exactly what we want
+    # Create a prompt for ChatGPT
     prompt = f"""Analyze the sentiment of this customer feedback and classify it as one of:
 - positive: Customer is happy/satisfied
 - negative: Customer is unhappy/dissatisfied

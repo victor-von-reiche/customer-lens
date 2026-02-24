@@ -1,8 +1,3 @@
-"""
-CustomerLens - AI-Powered Customer Feedback Intelligence Platform
-Main FastAPI application entry point
-"""
-
 from fastapi import FastAPI
 from app.database.db import init_db
 from app.api import feedback
@@ -19,7 +14,7 @@ app = FastAPI(
 async def startup_event():
     """Run when the application starts"""
     init_db()
-    print("✅ Database initialized!")
+    print("Database initialized!")
 
 
 # Include our feedback router

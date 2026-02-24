@@ -1,8 +1,3 @@
-"""
-Database models for CustomerLens
-This file defines what our feedback data looks like in the database
-"""
-
 from sqlalchemy import Column, Integer, String, Text, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -15,13 +10,12 @@ class Feedback(Base):
     """
     Feedback model - represents a single customer feedback entry.
 
-    Think of this like a form with these fields:
     - ID (automatically generated)
     - Customer name
     - Customer email
     - The actual feedback text
     - When it was created
-    - AI analysis results (we'll fill these in Days 2-4)
+    - AI analysis results
     """
 
     # Table name in database

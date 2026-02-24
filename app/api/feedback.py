@@ -1,7 +1,3 @@
-"""
-Feedback API endpoints
-"""
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -9,9 +5,10 @@ from typing import List
 from app.database.db import get_db
 from app.models.feedback import Feedback
 from app.api.schemas import FeedbackCreate, FeedbackResponse
-from app.services.chatgpt_sentiment import analyze_sentiment  # NEW!
+from app.services.chatgpt_sentiment import analyze_sentiment
+from app.services.gemini_category import categorize_feedback  # NEW!
 
-# Create a router - think of this as a section of the menu
+# Create a router
 router = APIRouter(
     prefix="/feedback",
     tags=["feedback"]
@@ -24,33 +21,46 @@ async def create_feedback(
     db: Session = Depends(get_db)
 ):
     """
-    Create a new feedback entry with automatic sentiment analysis.
+    Create new feedback entry with AI analysis.
 
     This endpoint:
     1. Receives customer feedback
     2. Analyzes sentiment using ChatGPT
-    3. Stores everything in database
+    3. Categorizes using Gemini
+    4. Stores everything in database
     """
 
-    # Step 1: Analyze sentiment using ChatGPT
-    print(f" Analyzing sentiment for: {feedback.feedback_text[:50]}...")
-    sentiment_result = await analyze_sentiment(feedback.feedback_text)
-    print(f" Sentiment: {sentiment_result['sentiment']}")
+    print(f"\n{'='*60}")
+    print(f"New feedback from: {feedback.customer_name}")
+    print(f"Feedback: {feedback.feedback_text[:80]}...")
+    print(f"{'='*60}")
 
-    # Step 2: Create a new Feedback object with the sentiment
+    # Step 1: Analyze sentiment using ChatGPT
+    print("ChatGPT analyzing sentiment...")
+    sentiment_result = await analyze_sentiment(feedback.feedback_text)
+    print(f"Sentiment: {sentiment_result['sentiment']}")
+
+    # Step 2: Categorize using Gemini (NEW!)
+    print("Gemini categorizing feedback...")
+    category_result = await categorize_feedback(feedback.feedback_text)
+    print(f"Category: {category_result['category']}")
+
+    # Step 3: Create feedback entry with BOTH results
     db_feedback = Feedback(
         customer_name=feedback.customer_name,
         customer_email=feedback.customer_email,
         feedback_text=feedback.feedback_text,
-        sentiment=sentiment_result['sentiment']  # Store the sentiment!
+        sentiment=sentiment_result['sentiment'],
+        category=category_result['category']
     )
 
-    # Step 3: Add to database and commit (save)
+    # Step 4: Save to database
     db.add(db_feedback)
     db.commit()
-    db.refresh(db_feedback)  # Get the ID that was auto-generated
+    db.refresh(db_feedback)
 
-    print(f" Saved feedback #{db_feedback.id} with sentiment: {sentiment_result['sentiment']}")
+    print(f"Saved as feedback #{db_feedback.id}")
+    print(f"{'='*60}\n")
 
     return db_feedback
 
@@ -62,14 +72,9 @@ async def get_feedback(
 ):
     """
     Get feedback by ID.
-
-    This endpoint retrieves a specific feedback entry.
-
     """
-    # Query the database for feedback with this ID
     feedback = db.query(Feedback).filter(Feedback.id == feedback_id).first()
 
-    # If not found, return 404 error
     if feedback is None:
         raise HTTPException(status_code=404, detail="Feedback not found")
 
