@@ -1,22 +1,23 @@
+"""
+Pydantic schemas for request/response validation
+"""
+
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
 
 
 class FeedbackCreate(BaseModel):
-    """
-    Schema for creating new feedback.
-    """
+    """Schema for creating new feedback."""
     customer_name: str
-    customer_email: EmailStr  # Validates it's a real email format
+    customer_email: EmailStr
     feedback_text: str
 
 
 class FeedbackResponse(BaseModel):
-    """
-    Schema for feedback responses.
-    """
+    """Schema for feedback responses."""
     id: int
+    customer_id: int
     customer_name: str
     customer_email: str
     feedback_text: str
@@ -26,5 +27,4 @@ class FeedbackResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        """Tells Pydantic this can come from database models"""
         from_attributes = True

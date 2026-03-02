@@ -1,40 +1,31 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+"""
+Database models for CustomerLens
+"""
+
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 from datetime import datetime
 
-# This is the base class all our models inherit from
 Base = declarative_base()
 
 
 class Feedback(Base):
-    """
-    Feedback model - represents a single customer feedback entry.
+    """Feedback model - represents a single customer feedback entry."""
 
-    - ID (automatically generated)
-    - Customer name
-    - Customer email
-    - The actual feedback text
-    - When it was created
-    - AI analysis results
-    """
-
-    # Table name in database
     __tablename__ = "feedback"
 
-    # Columns (fields)
     id = Column(Integer, primary_key=True, index=True)
+    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=False)
     customer_name = Column(String(100), nullable=False)
     customer_email = Column(String(100), nullable=False)
     feedback_text = Column(Text, nullable=False)
-
-    # AI Analysis results (will be filled in later days)
-    sentiment = Column(String(20), nullable=True)  # positive/negative/neutral/mixed
-    category = Column(String(50), nullable=True)  # product/service/delivery/pricing
-    ai_response = Column(Text, nullable=True)  # generated response
-
-    # Timestamp
+    sentiment = Column(String(20), nullable=True)
+    category = Column(String(50), nullable=True)
+    ai_response = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    customer = relationship("Customer", back_populates="feedbacks")
+
     def __repr__(self):
-        """String representation for debugging"""
         return f"<Feedback(id={self.id}, customer={self.customer_name})>"

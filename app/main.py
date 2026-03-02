@@ -1,38 +1,44 @@
+"""
+CustomerLens - AI-Powered Customer Feedback Intelligence Platform
+Main FastAPI application entry point
+"""
+
 from fastapi import FastAPI
 from app.database.db import init_db
 from app.api import feedback
+from app.rag.vectorstore import knowledge_base
+from app.models.customer import Customer
 
-# Create our FastAPI application
 app = FastAPI(
     title="CustomerLens",
-    description="AI-Powered Customer Feedback Intelligence Platform",
+    description="AI-Powered Customer Feedback Intelligence Platform for AURON",
     version="1.0.0"
 )
 
-# Initialize database on startup
+
 @app.on_event("startup")
 async def startup_event():
-    """Run when the application starts"""
+    """Initialize database and load guidelines into vector store."""
     init_db()
-    print("Database initialized!")
+    print("Database initialized")
+
+    knowledge_base.load_guidelines("company_guidelines.txt")
+    print("Knowledge base ready")
 
 
-# Include our feedback router
 app.include_router(feedback.router)
 
 
-# Welcome endpoint
 @app.get("/")
 async def root():
     """Welcome endpoint"""
     return {
-        "message": "Welcome to CustomerLens!",
+        "message": "Welcome to CustomerLens - AURON Customer Feedback System",
         "status": "API is running",
         "version": "1.0.0"
     }
 
 
-# Health check
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
