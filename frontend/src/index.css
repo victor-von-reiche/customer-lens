@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-auron-navy: #01040D;
+  --color-auron-orange: #FF6B35;
+  --color-auron-dark: #05070A;
+  --color-auron-gray: #1F2937;
+  --font-sans: "Inter", sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-auron-navy text-white font-sans antialiased min-h-screen;
+}
+
+.glass-morphism {
+  @apply bg-black/40 backdrop-blur-md border border-white/10;
+}
+
+.btn-primary {
+  @apply bg-auron-orange hover:bg-auron-orange/90 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95;
+}
