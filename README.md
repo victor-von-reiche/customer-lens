@@ -4,59 +4,76 @@
 
 ## Overview
 
-CustomerLens analyzes customer feedback using AI to provide sentiment analysis, categorization, and intelligent response generation.
+CustomerLens is a fullstack AI application for analyzing customer feedback. It combines a FastAPI backend with a frontend interface to classify sentiment, categorize feedback, and generate AI-assisted customer service responses using company guidelines.
 
-## Features
+## Project Structure
 
-- **Sentiment Analysis** using ChatGPT (positive/negative/neutral/mixed)
-- **Smart Categorization** using Gemini (product/service/delivery/pricing)
-- **RAG-based Response Generation** with company guidelines
-- **Automated Workflows** via n8n integration
-- **RESTful API** with FastAPI
+```text
+customer-lens/
+├── backend/
+│   ├── app/
+│   ├── requirements.txt
+│   └── company_guidelines.txt
+├── frontend/
+├── README.md
+└── .gitignore
+````
 
 ## Tech Stack
 
-- Python 3.12
-- FastAPI
-- SQLite
-- ChatGPT API (OpenAI)
-- Gemini API (Google)
-- LangChain + ChromaDB
-- n8n
+### Backend
 
-## Installation
+* Python 3.12
+* FastAPI
+* SQLite
+* SQLAlchemy
+* OpenAI API
+* Google Gemini API
+* ChromaDB
+
+### Frontend
+
+* React
+* Vite
+* TypeScript
+
+## Backend Setup
+
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/customer-lens.git
-cd customer-lens
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install dependencies
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-
-# Set up environment variables
 cp .env.example .env
-# Edit .env with your API keys
 ```
 
-## Running the Application
+## Run Backend
+
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Visit `http://localhost:8000/docs` for API documentation.
+API docs:
 
-## API Endpoints
+```text
+http://localhost:8000/docs
+```
 
-- `POST /feedback` - Submit feedback
-- `GET /feedback/{id}` - Get feedback
-- `GET /feedback` - List all feedback
-- `PUT /feedback/{id}` - Update feedback
-- `DELETE /feedback/{id}` - Delete feedback
-- `POST /feedback/{id}/analyze` - Analyze feedback
+## Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Current API Endpoints
+
+* `GET /` - Welcome endpoint
+* `GET /health` - Health check
+* `POST /feedback/` - Submit feedback and run AI analysis
+* `GET /feedback/{feedback_id}` - Get feedback by ID
+* `GET /feedback/customer/{email}` - Get feedback by customer email
 
 ## Author
 
