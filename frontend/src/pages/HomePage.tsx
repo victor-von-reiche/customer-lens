@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ChevronRight, Camera } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const PRODUCTS = [
     { id: 1, name: 'VELOX ELITE', description: 'SRAM Force eTap, 6.9kg, Red Copper Metallic', price: '€6,259.00', image: '/assets/bikes/velox_red.png' },
@@ -34,9 +34,7 @@ const HomePage = () => {
                         transition={{ duration: 0.9, ease: "easeOut" }}
                         className="max-w-[540px] rounded-[32px] border border-white/10 bg-black/20 p-10 md:p-12 shadow-[0_8px_40px_rgba(0,0,0,0.25)] backdrop-blur-md"
                     >
-                        <img
 
-                        />
 
                         <h1 className="mb-8 text-[72px] md:text-[88px] font-black uppercase italic tracking-[-0.04em] leading-[0.88] text-white">
                             ELEVATE
@@ -45,12 +43,12 @@ const HomePage = () => {
                         </h1>
 
                         <p className="mb-10 max-w-[440px] text-[22px] leading-[1.6] text-white/78">
-                            Discover uncompromising performance, precision, and distance with the AURON collection.
+                            A fictional bike brand. A real support workflow: classify feedback, inspect policy evidence, and review AI-assisted replies.
                         </p>
 
-                        <button className="inline-flex items-center rounded-full border border-white/20 bg-white/8 px-8 py-4 text-[13px] font-semibold uppercase tracking-[0.22em] text-white backdrop-blur-sm transition-all duration-300 hover:bg-white hover:text-black">
-                            Explore Collection
-                        </button>
+                        <Link to="/dashboard" className="inline-flex items-center rounded-full border border-white/20 bg-white/8 px-8 py-4 text-[13px] font-semibold uppercase tracking-[0.22em] text-white backdrop-blur-sm transition-all duration-300 hover:bg-white hover:text-black">
+                            Explore CustomerLens
+                        </Link>
                     </motion.div>
                 </div>
             </section>
@@ -71,7 +69,7 @@ const HomePage = () => {
                             <p className="text-gray-500 text-xs tracking-widest mb-4">{bike.description}</p>
                             <div className="flex items-center justify-between">
                                 <span className="font-black text-lg">{bike.price}</span>
-                                <button className="text-auron-orange font-black text-[10px] tracking-widest uppercase hover:underline flex items-center gap-1">VIEW BIKE <ChevronRight className="w-3 h-3" /></button>
+
                             </div>
                         </motion.div>
                     ))}
@@ -96,36 +94,6 @@ const HomePage = () => {
                             </div>
                         </div>
                     ))}
-                </div>
-            </section>
-
-            {/* Community Feed */}
-            <section className="py-24 px-12 md:px-24 border-t border-gray-100">
-                <div className="flex justify-between items-end mb-12">
-                    <div>
-                        <h2 className="text-4xl font-black uppercase italic tracking-tighter">COMMUNITY FEED</h2>
-                        <p className="text-gray-400 mt-2">Tag @AURONBIKES #AURONELEVATE</p>
-                    </div>
-                    <button className="flex items-center gap-2 font-black uppercase text-xs tracking-widest border-b-2 border-auron-orange pb-1">
-                        <Camera className="w-4 h-4 text-auron-orange" /> VIEW FEED
-                    </button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[1, 2, 3, 4].map(idx => (<div key={idx} className="aspect-square bg-gray-200" />))}
-                </div>
-            </section>
-
-            {/* Newsletter */}
-            <section className="bg-auron-navy py-24 px-12 md:px-24 text-white">
-                <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
-                    <div>
-                        <h2 className="text-3xl font-black uppercase italic tracking-tighter mb-2 underline decoration-auron-orange decoration-4">NEWSLETTER SIGNUP</h2>
-                        <p className="text-white/50">Stay up to date with the latest bike releases and performance tips.</p>
-                    </div>
-                    <div className="flex w-full md:w-auto gap-4">
-                        <input type="email" placeholder="YOUR EMAIL" className="bg-transparent border-b-2 border-white/20 px-4 py-3 focus:border-auron-orange outline-none flex-1 md:w-64" />
-                        <button className="bg-white text-auron-navy font-black px-8 py-3 uppercase italic text-sm hover:bg-auron-orange hover:text-white transition-all">SIGN UP</button>
-                    </div>
                 </div>
             </section>
 

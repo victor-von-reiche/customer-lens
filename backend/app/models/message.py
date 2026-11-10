@@ -1,25 +1,19 @@
-"""
-Message model for tracking individual chat messages in a feedback thread.
-"""
+"""Messages inside a support ticket."""
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
-from datetime import datetime
-from app.models.feedback import Base
+
+from app.models.feedback import Base, utcnow
 
 
 class Message(Base):
-    """Message model - represents a single chat message."""
+    """Store a customer message or a reviewed support response."""
 
     __tablename__ = "messages"
 
-    id = Column(Integer, primary_key=True, index=True)
-    feedback_id = Column(Integer, ForeignKey('feedback.id'), nullable=False)
-    sender = Column(String(20), nullable=False)  # 'customer', 'agent', 'system'
+    id = Column(Integer, primary_key=True)
+    feedback_id = Column(Integer, ForeignKey("feedback.id"), nullable=False)
+    sender = Column(String(20), nullable=False)
     content = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow)
-
+    timestamp = Column(DateTime, default=utcnow, nullable=False)
     feedback = relationship("Feedback", back_populates="messages")
-
-    def __repr__(self):
-        return f"<Message(id={self.id}, sender={self.sender}, feedback_id={self.feedback_id})>"

@@ -1,152 +1,117 @@
-"""
-Dashboard Service
-Handles data processing logic for the CS dashboard, decoupling from the frontend.
-"""
+"""Dashboard metrics with explicit status and sentiment definitions."""
 
-from typing import List
-from sqlalchemy.orm import Session
+from datetime import UTC, datetime
+
 from sqlalchemy import func
-from datetime import datetime
-from app.models.feedback import Feedback
+
+from app.models.feedback import Escalation, Feedback
 
 
-def calculate_dashboard_stats(db: Session) -> dict:
-    """
-    Calculate KPIs for the dashboard based on stored feedback.
-
-    Args:
-        db: Database session
-
-    Returns:
-        dict: A dictionary of dashboard statistics metrics.
-    """
-    feedbacks = db.query(Feedback).all()
-    total_count = len(feedbacks)
-
-    open_count = 0
-    closed_count = 0
-    non_negative_count = 0
-
-    today_date = datetime.utcnow().date()
-    processed_today = 0
-    critical_today = []
-    positive_today = 0
-    non_negative_today = 0
-
-    for f in feedbacks:
-        messages = f.messages
-        if not messages or messages[-1].sender == 'customer':
-            open_count += 1
-        else:
-            closed_count += 1
-
-        sentiment_lower = (f.sentiment or "").lower()
-        if sentiment_lower != 'negative':
-            non_negative_count += 1
-
-        f_date = f.created_at.date() if f.created_at else None
-        if f_date == today_date:
-            processed_today += 1
-            if (f.urgency or "").lower() == 'critical':
-                critical_today.append(f)
-            if sentiment_lower == 'positive':
-                positive_today += 1
-            if sentiment_lower != 'negative':
-                non_negative_today += 1
-
-    satisfaction_score = round((non_negative_count / total_count) * 100) if total_count > 0 else 0
-    satisfaction_today = round((non_negative_today / processed_today) * 100) if processed_today > 0 else 0
-
-    critical_resolved_today = 0
-    for cf in critical_today:
-        c_msgs = cf.messages
-        if c_msgs and c_msgs[-1].sender != 'customer':
-            critical_resolved_today += 1
-
+def calculate_dashboard_stats(db):
+    """Count states and sentiment, including saved legacy classifications."""
+    tickets = db.query(Feedback).all()
+    analyzed = [
+        t
+        for t in tickets
+        if t.analysis_status in {"completed", "partial"}
+        or (
+            t.analysis_status == "pending"
+            and not t.analyses
+            and t.sentiment in {"positive", "negative", "neutral", "mixed"}
+        )
+    ]
+    today = datetime.now(UTC).date()
+    analyzed_today = [t for t in analyzed if t.created_at.date() == today]
+    critical_today = [t for t in analyzed_today if t.urgency == "critical"]
     return {
-        "total_count": total_count,
-        "open_count": open_count,
-        "closed_count": closed_count,
-        "satisfaction_score": satisfaction_score,
-        "processed_today": processed_today,
+        "non_negative_sentiment_percent": round(
+            sum(t.sentiment != "negative" for t in analyzed)
+            / len(analyzed)
+            * 100
+        )
+        if analyzed
+        else None,
+        "non_negative_sentiment_today_percent": round(
+            sum(t.sentiment != "negative" for t in analyzed_today)
+            / len(analyzed_today)
+            * 100
+        )
+        if analyzed_today
+        else None,
         "critical_today": len(critical_today),
-        "critical_resolved_today": critical_resolved_today,
-        "positive_today": positive_today,
-        "satisfaction_today": satisfaction_today
+        "critical_resolved_today": sum(
+            t.status == "resolved" for t in critical_today
+        ),
+        "positive_today": sum(
+            t.sentiment == "positive" for t in analyzed_today
+        ),
+        "positive_sentiment_today_percent": round(
+            sum(t.sentiment == "positive" for t in analyzed_today)
+            / len(analyzed_today)
+            * 100
+        )
+        if analyzed_today
+        else None,
+        "total_count": len(tickets),
+        "open_count": sum(t.status == "open" for t in tickets),
+        "waiting_count": sum(
+            t.status == "waiting_for_customer" for t in tickets
+        ),
+        "resolved_count": sum(t.status == "resolved" for t in tickets),
+        "positive_sentiment_percent": round(
+            sum(t.sentiment == "positive" for t in analyzed)
+            / len(analyzed)
+            * 100
+        )
+        if analyzed
+        else None,
+        "analyzed_count": len(analyzed),
+        "failed_count": sum(t.analysis_status == "failed" for t in tickets),
+        "active_escalations": db.query(Escalation)
+        .filter(Escalation.status != "resolved")
+        .count(),
+        "created_today": sum(t.created_at.date() == today for t in tickets),
+        "resolved_today": sum(
+            t.resolved_at is not None and t.resolved_at.date() == today
+            for t in tickets
+        ),
     }
 
 
-def get_filtered_sorted_feedbacks(
-    db: Session,
-    filter_val: str,
-    sort_by: str,
-    skip: int = 0,
-    limit: int = 100
-) -> List[Feedback]:
-    """
-    Apply filtering and priority sorting on feedbacks.
+def get_filtered_sorted_feedbacks(db, sentiment, status, sort_by, skip, limit):
+    """Filter and paginate in SQL with a stable ticket-ID tie breaker."""
+    from sqlalchemy import case
 
-    Args:
-        db: Database session
-        filter_val: The exact sentiment to filter by ('All', 'Positive', 'Negative', 'Mixed')
-        sort_by: The sort order method
-        skip: records to skip
-        limit: items limit
-
-    Returns:
-        List[Feedback]: The sorted and filtered record set.
-    """
     query = db.query(Feedback)
-
-    if filter_val and filter_val.lower() != 'all':
-        query = query.filter(func.lower(Feedback.sentiment) == filter_val.lower())
-
-    feedbacks = query.all()
-
-    def get_priority_score(item: Feedback) -> int:
-        u = (item.urgency or "").lower()
-        if u == 'critical':
-            return 4
-        if u == 'high':
-            return 3
-        if u == 'medium':
-            return 2
-        if u == 'low':
-            return 1
-
-        s = (item.sentiment or "").lower()
-        if s == 'negative':
-            return 3
-        if s == 'mixed':
-            return 2
-        return 1
-
-    def get_sentiment_score(item: Feedback) -> int:
-        s = (item.sentiment or "").lower()
-        if s == 'negative':
-            return 3
-        if s == 'mixed':
-            return 2
-        return 1
-
-    def get_timestamp(item: Feedback) -> float:
-        if not item.created_at:
-            return 0.0
-        return item.created_at.timestamp()
-
-    if sort_by == 'Urgency':
-        feedbacks.sort(
-            key=lambda x: (-get_priority_score(x), -get_timestamp(x))
-        )
-    elif sort_by == 'Newest':
-        feedbacks.sort(key=lambda x: -get_timestamp(x))
-    elif sort_by == 'Oldest':
-        feedbacks.sort(key=lambda x: get_timestamp(x))
-    elif sort_by == 'Sentiment':
-        feedbacks.sort(
-            key=lambda x: (-get_sentiment_score(x), -get_timestamp(x))
-        )
-    elif sort_by == 'Category':
-        feedbacks.sort(key=lambda x: x.category or "")
-
-    return feedbacks[skip : skip + limit]
+    if sentiment != "all":
+        query = query.filter(func.lower(Feedback.sentiment) == sentiment)
+    if status != "all":
+        query = query.filter(Feedback.status == status)
+    priority = case(
+        (Feedback.analysis_status == "failed", 0),
+        (Feedback.urgency == "critical", 1),
+        (Feedback.urgency == "high", 2),
+        (Feedback.urgency == "medium", 3),
+        else_=4,
+    )
+    ordering = {
+        "urgency": [priority, Feedback.updated_at.desc()],
+        "newest": [Feedback.created_at.desc()],
+        "oldest": [Feedback.created_at.asc()],
+        "sentiment": [
+            case(
+                (Feedback.sentiment == "negative", 0),
+                (Feedback.sentiment == "mixed", 1),
+                (Feedback.sentiment == "neutral", 2),
+                else_=3,
+            ),
+            Feedback.updated_at.desc(),
+        ],
+        "category": [Feedback.category.asc()],
+    }
+    return (
+        query.order_by(*ordering[sort_by], Feedback.id.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )

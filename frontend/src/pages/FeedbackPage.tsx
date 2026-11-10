@@ -23,7 +23,7 @@ const FeedbackPage = () => {
             setSubmitted(result);
         } catch (error) {
             console.error("Feedback submission error:", error);
-            setError('Something went wrong. Please try again.');
+            setError((error as Error).message || 'Unable to submit feedback.');
         } finally {
             setLoading(false);
         }
@@ -77,13 +77,17 @@ const FeedbackPage = () => {
                                 Share Your Experience
                             </h2>
 
+                            <div className="mb-6 rounded-xl border border-white/10 p-4 text-sm text-white/70">
+                                Try a synthetic example: <button className="text-auron-orange underline" onClick={() => setFormData({ customer_name: 'Demo visitor', customer_email: 'visitor@example.com', feedback_text: 'My brakes failed and caused an accident. I need help.' })}>Product safety issue</button>
+                                <p className="mt-2">Each submission creates a separate ticket. Use the dashboard to add a follow-up to an existing ticket.</p>
+                            </div>
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-white/60 mb-2">Full Name</label>
+                                        <label htmlFor="customer-name" className="block text-sm font-medium text-white/60 mb-2">Full Name</label>
                                         <input
                                             required
-                                            type="text"
+                                            id="customer-name" maxLength={100} autoComplete="name" type="text"
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-auron-orange focus:ring-1 focus:ring-auron-orange transition-all"
                                             placeholder="Enter your name"
                                             value={formData.customer_name}
@@ -91,10 +95,10 @@ const FeedbackPage = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-white/60 mb-2">Email Address</label>
+                                        <label htmlFor="customer-email" className="block text-sm font-medium text-white/60 mb-2">Email Address</label>
                                         <input
                                             required
-                                            type="email"
+                                            id="customer-email" autoComplete="email" type="email"
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-auron-orange focus:ring-1 focus:ring-auron-orange transition-all"
                                             placeholder="Enter your email"
                                             value={formData.customer_email}
@@ -104,10 +108,10 @@ const FeedbackPage = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-white/60 mb-2">Your Feedback</label>
+                                    <label htmlFor="customer-feedback" className="block text-sm font-medium text-white/60 mb-2">Your Feedback</label>
                                     <textarea
                                         required
-                                        rows={5}
+                                        id="customer-feedback" maxLength={10000} rows={5}
                                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-auron-orange focus:ring-1 focus:ring-auron-orange transition-all resize-none"
                                         placeholder="Tell us about your AURON experience..."
                                         value={formData.feedback_text}
@@ -142,8 +146,7 @@ const FeedbackPage = () => {
                                 <CheckCircle2 className="w-10 h-10 text-green-500" />
                             </div>
                             <h2 className="text-4xl md:text-5xl font-black mb-6 uppercase italic">Thank You, {submitted.customer_name}!</h2>
-                            <p className="text-white/60 text-xl font-medium">Your feedback has been received and is being reviewed by our team.</p>
-
+                            <p className="text-white/60 text-xl font-medium">Thank you for your message. Our team will get back to you as soon as possible.</p>
                             <button
                                 onClick={() => setSubmitted(null)}
                                 className="mt-16 text-auron-orange font-black uppercase tracking-widest text-sm hover:underline"

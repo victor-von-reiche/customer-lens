@@ -1,0 +1,15 @@
+[tool.ruff]
+line-length = 79
+target-version = "py312"
+exclude = [".venv", "node_modules"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/dev.py" = ["UP036"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+pythonpath = ["backend"]

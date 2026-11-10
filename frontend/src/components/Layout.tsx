@@ -1,62 +1,49 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Search, User, ShoppingCart } from 'lucide-react';
+import { LayoutDashboard, MessageSquare } from 'lucide-react';
+import { api, type RuntimeConfig } from '../api';
 
-const Layout: React.FC = () => {
-    return (
-        <div className="flex flex-col min-h-screen">
-            <header className="sticky top-0 z-50 glass-morphism py-5 px-6 md:px-12 flex items-center justify-between border-b border-white/10">
-                <Link to="/" className="flex items-center group">
-                    <img src="/assets/logo/AURON_LOGO.png" alt="AURON" className="h-10 w-auto" style={{ mixBlendMode: 'screen' }} />
+/** Show navigation and disclose whether results are simulated. */
+export default function Layout() {
+    const [config, setConfig] = useState<RuntimeConfig | null>(null);
+    const [error, setError] = useState('');
+    const [token, setToken] = useState('');
+
+    useEffect(() => {
+        api.config().then(setConfig).catch(() => setError('Backend unavailable. Check that it is running.'));
+    }, []);
+
+    return <div className="flex min-h-screen flex-col">
+        <a href="#main" className="skip-link">Skip to content</a>
+        <header className="glass-morphism border-b border-white/10 px-5 py-5 md:px-12">
+            <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5">
+                <Link to="/" aria-label="AURON overview">
+                    <img src="/assets/logo/AURON_LOGO.png" alt="AURON" className="h-9 w-auto" />
                 </Link>
-
-                <nav className="hidden lg:flex items-center">
-                    {/* Customer Links */}
-                    <div className="flex items-center gap-6 mr-8 text-[11px] font-black tracking-[0.15em] uppercase text-white/90">
-                        <Link to="#" className="hover:text-auron-orange transition-colors duration-300">BIKES</Link>
-                        <Link to="#" className="hover:text-auron-orange transition-colors duration-300">GEAR</Link>
-                        <Link to="#" className="hover:text-auron-orange transition-colors duration-300">TECHNOLOGY</Link>
-                        <Link to="#" className="hover:text-auron-orange transition-colors duration-300">COMMUNITY</Link>
-                        <Link to="#" className="hover:text-auron-orange transition-colors duration-300">ABOUT US</Link>
-                    </div>
-
-                    {/* Customer Icons */}
-                    <div className="flex items-center gap-5 mr-8 text-white/90">
-                        <button className="hover:text-auron-orange transition-colors"><Search className="w-4 h-4" /></button>
-                        <button className="hover:text-auron-orange transition-colors"><User className="w-4 h-4" /></button>
-                        <button className="hover:text-auron-orange transition-colors relative">
-                            <ShoppingCart className="w-4 h-4" />
-                            <span className="absolute -top-1.5 -right-2 bg-auron-orange text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">0</span>
-                        </button>
-                    </div>
-
-                    {/* Employee Links (Admin tools) */}
-                    <div className="flex items-center gap-6 border-l border-white/20 pl-8 text-[11px] font-bold tracking-widest uppercase">
-                        <NavLink
-                            to="/feedback"
-                            className={({ isActive }) => `flex items-center gap-2 transition-colors ${isActive ? 'text-auron-orange' : 'text-white/50 hover:text-white'}`}
-                        >
-                            <MessageSquare className="w-3.5 h-3.5" />
-                            <span>Contact us</span>
-                        </NavLink>
-                        <NavLink
-                            to="/dashboard"
-                            className={({ isActive }) => `flex items-center gap-2 transition-colors ${isActive ? 'text-auron-orange' : 'text-white/50 hover:text-white'}`}
-                        >
-                            <LayoutDashboard className="w-3.5 h-3.5" />
-                            <span>Dashboard</span>
-                        </NavLink>
-                    </div>
+                <nav aria-label="Main navigation" className="flex flex-wrap gap-5 text-sm font-semibold">
+                    <NavLink to="/" end>Overview</NavLink>
+                    <NavLink to="/feedback" className="flex items-center gap-2"><MessageSquare size={16} />Contact us</NavLink>
+                    <NavLink to="/dashboard" className="flex items-center gap-2"><LayoutDashboard size={16} />Dashboard</NavLink>
                 </nav>
-            </header>
-            <main className="flex-1">
-                <Outlet />
-            </main>
-            <footer className="py-8 px-6 md:px-12 border-t border-white/10 text-center text-white/50 text-sm">
-                © {new Date().getFullYear()} AURON Road Bikes. Performance, Redefined.
-            </footer>
-        </div>
-    );
-};
-
-export default Layout;
+            </div>
+        </header>
+        {(!config || config.mode === 'demo') && <div className="border-b border-white/10 bg-white/[0.04] px-5 py-3 text-center text-sm text-white/75" role="status">
+            {config?.mode === 'demo'
+                ? 'Demo mode · Synthetic examples and simulated English keyword analysis. No API calls or emails.'
+                : error || 'Connecting to CustomerLens…'}
+        </div>}
+        {config?.requires_token && <form className="mx-auto flex w-full max-w-xl flex-wrap gap-3 p-4" onSubmit={event => {
+            event.preventDefault();
+            sessionStorage.setItem('customerlens-token', token);
+            window.location.reload();
+        }}>
+            <label htmlFor="access-token" className="w-full text-sm">API access token</label>
+            <input id="access-token" type="password" autoComplete="off" value={token} onChange={event => setToken(event.target.value)} className="field flex-1" required />
+            <button className="action" type="submit">Connect</button>
+        </form>}
+        <main id="main" className="flex-1"><Outlet /></main>
+        <footer className="border-t border-white/10 px-6 py-8 text-center text-sm text-white/50">
+            CustomerLens · A portfolio project for fictional bike brand AURON
+        </footer>
+    </div>;
+}

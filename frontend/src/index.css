@@ -23,3 +23,25 @@ body {
 .btn-primary {
   @apply bg-auron-orange hover:bg-auron-orange/90 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95;
 }
+
+nav a[aria-current="page"] { color: var(--color-auron-orange); }
+:focus-visible { outline: 2px solid var(--color-auron-orange); outline-offset: 4px; }
+.skip-link { position: absolute; top: -80px; left: 16px; z-index: 100; padding: 12px; background: #111; }
+.skip-link:focus { top: 8px; }
+.panel { border: 1px solid #ffffff14; border-radius: 18px; background: #ffffff04; }
+.eyebrow { color: #ff8a60; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.field { min-width: 0; border: 1px solid #ffffff26; border-radius: 9px; background: #10151d; color: #f8fafc; padding: 10px 12px; font-size: 14px; }
+.action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #ffffff26; border-radius: 9px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.action:hover:not(:disabled) { background: #ffffff0d; }
+.action-primary { background: #ff6b35; color: #100a07; border-color: #ff6b35; }
+.action-primary:hover:not(:disabled) { background: #ff8a60; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+.badge { display: inline-block; border: 1px solid #ffffff1a; border-radius: 6px; padding: 4px 8px; font-size: 11px; color: #d1d5db; }
+.badge-alert { border-color: #f8717155; background: #ef444414; color: #fca5a5; }
+.notice-error { border: 1px solid #f8717155; border-radius: 12px; background: #ef444414; padding: 16px; color: #fecaca; font-size: 14px; }
+.ticket-row { display: block; width: 100%; text-align: left; border: 1px solid #ffffff14; border-radius: 14px; padding: 20px; background: #ffffff03; cursor: pointer; }
+.ticket-row:hover { background: #ffffff08; }
+.ticket-row-active { border-color: #ff6b3599; background: #ff6b3509; }
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

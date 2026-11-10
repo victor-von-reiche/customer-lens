@@ -65,3 +65,24 @@ chroma_data/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# Local runtime and reports
+*.db.backup-*
+*.db-journal
+*.db-wal
+*.db-shm
+.ruff_cache/
+policies/.chroma/
+evaluation/live-report.json
+
+# Environment overrides and rotated runtime logs
+.env.*
+!.env.example
+!.env.docker.example
+*.log.*
+backend/logs/
+
+# Generated evaluation reports
+evaluation/classification-live-report.json
+evaluation/demo-report.json
+evaluation/live-smoke-report.json
