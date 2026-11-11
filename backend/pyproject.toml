@@ -11,5 +11,5 @@ ignore = []
 "scripts/dev.py" = ["UP036"]
 
 [tool.pytest.ini_options]
-testpaths = ["backend/tests"]
-pythonpath = ["backend"]
+testpaths = ["tests"]
+pythonpath = ["."]

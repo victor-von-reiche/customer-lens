@@ -8,7 +8,7 @@ reviewable in `cases.json`; they are not independent production ground truth.
 From the backend directory after installing its dependencies:
 
 ```bash
-.venv/bin/python -m app.evaluate --output ../evaluation/demo-report.json
+.venv/bin/python -m app.evaluate --output evaluation/demo-report.json
 ```
 
 The generated demo report describes deterministic keyword rules and retrieval,
@@ -18,7 +18,7 @@ or to build the policy index. This small authored set is not a held-out benchmar
 For a billable live run, configure `backend/.env`, then explicitly opt in:
 
 ```bash
-.venv/bin/python -m app.evaluate --mode live --allow-live --limit 5 --output ../evaluation/live-report.json
+.venv/bin/python -m app.evaluate --mode live --allow-live --limit 5 --output evaluation/live-report.json
 ```
 
 Remove `--limit` to run all cases (up to 104 provider requests before SDK retries).

@@ -8,11 +8,11 @@ CustomerLens is an AI-assisted customer support application for **AURON**, a fic
 2. Switch to **Dashboard** to view the message as a support employee. Feedback is classified by sentiment, category, and urgency.
 3. Open the ticket to review and edit the suggested reply before saving it to the conversation. Critical feedback is also flagged for review.
 
-A retrieval-augmented generation (RAG) system indexes company policies from [`policies/support.json`](policies/support.json). It retrieves relevant sections for each message and provides them to Gemini when generating a reply. The dashboard can show the sources used. Replies are saved in the application; they are not sent as external emails.
+A retrieval-augmented generation (RAG) system indexes company policies from [`backend/policies/support.json`](backend/policies/support.json). It retrieves relevant sections for each message and provides them to Gemini when generating a reply. The dashboard can show the sources used. Replies are saved in the application; they are not sent as external emails.
 
 ## Getting started
 
-**Requirements:** Python 3.12, Node.js 22, and a Gemini API key for live analysis.
+**For local development:** Python 3.12 and Node.js 22. Live analysis also requires a Gemini API key.
 
 1. Clone the repository and open its directory:
 
@@ -26,15 +26,15 @@ A retrieval-augmented generation (RAG) system indexes company policies from [`po
 3. Start the frontend and backend:
 
    ```bash
-   python3 scripts/dev.py
+   python3 backend/scripts/dev.py
    ```
 
 4. Open [http://localhost:5173](http://localhost:5173), select **Contact us**, and then visit **Dashboard** to review the feedback. The first start installs the required dependencies. Stop both servers with `Ctrl+C`.
 
 Classification and reply drafts use `gemini-3.5-flash-lite` by default, configured with `GEMINI_MODEL` in `backend/.env`. Gemini usage is subject to the configured project's quota and pricing. If analysis is unavailable, the ticket remains available for manual review.
 
-For Docker, copy `.env.docker.example` to `.env.docker`, add your Gemini key,
-and run `docker compose --env-file .env.docker up --build`. Open the same URL;
+For Docker, copy `docker/.env.docker.example` to `docker/.env.docker`, add your Gemini key,
+and run `docker compose -f docker/compose.yaml --env-file docker/.env.docker up --build`. Open the same URL;
 stop with `Ctrl+C`. Ticket data persists in a named Docker volume.
 
 ## Demo mode
@@ -42,7 +42,7 @@ stop with `Ctrl+C`. Ticket data persists in a named Docker volume.
 To explore the workflow without an API key, run:
 
 ```bash
-python3 scripts/dev.py --demo
+python3 backend/scripts/dev.py --demo
 ```
 
 Demo mode uses a separate database, synthetic feedback, and simulated English-language analysis and replies. It does not call Gemini.
@@ -53,14 +53,14 @@ Demo mode uses a separate database, synthetic feedback, and simulated English-la
 - **Backend:** Python, FastAPI, SQLAlchemy, and SQLite
 - **AI and retrieval:** Gemini for classification and drafts; a local lexical index for RAG, with optional Chroma semantic retrieval
 
-The API documentation is available at [http://localhost:8000/docs](http://localhost:8000/docs) while the backend is running. For evaluation details, see [evaluation/README.md](evaluation/README.md).
+The API documentation is available at [http://localhost:8000/docs](http://localhost:8000/docs) while the backend is running. For evaluation details, see [backend/evaluation/README.md](backend/evaluation/README.md).
 
 ## Development
 
 ```bash
 backend/.venv/bin/python -m pip install -r backend/requirements-dev.txt
-backend/.venv/bin/ruff check backend scripts
-backend/.venv/bin/pytest -q
+backend/.venv/bin/ruff check backend
+backend/.venv/bin/pytest -q backend
 cd frontend
 npm run lint
 npm run build

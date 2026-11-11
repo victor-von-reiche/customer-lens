@@ -5,9 +5,10 @@ import json
 
 import httpx
 import pytest
+from pydantic import ValidationError
+
 from app.services.analysis_errors import describe_error
 from app.services.classification import LiveProvider
-from pydantic import ValidationError
 
 LABELS = {
     "sentiment": "positive",

@@ -3,7 +3,7 @@ WORKDIR /app/backend
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/app ./app
-COPY policies /app/policies
+COPY backend/policies /app/backend/policies
 RUN useradd --uid 10001 --create-home appuser \
     && mkdir -p /data /app/backend/logs \
     && chown -R appuser:appuser /data /app/backend/logs

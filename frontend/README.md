@@ -7,7 +7,7 @@ npm ci
 npm run dev
 ```
 
-Start the backend on port 8000 first, or use `python3 scripts/dev.py` from the
+Start the backend on port 8000 first, or use `python3 backend/scripts/dev.py` from the
 repository root. Select the optional keyless demo with `--demo`. The development server runs on http://localhost:5173 and proxies
 `/api` to the backend. Build with `npm run build`; check with `npm run lint`.
 

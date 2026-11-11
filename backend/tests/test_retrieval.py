@@ -3,9 +3,10 @@
 import json
 import sqlite3
 
+from sqlalchemy import create_engine, inspect
+
 from app.database.db import init_db
 from app.rag.vectorstore import CompanyKnowledgeBase
-from sqlalchemy import create_engine, inspect
 
 
 def test_policy_edit_changes_version_without_changing_old_evidence(tmp_path):

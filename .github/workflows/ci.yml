@@ -11,16 +11,16 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements*.txt
       - run: pip install -r backend/requirements-dev.txt
-      - run: ruff check backend scripts
-      - run: ruff format --check backend scripts
+      - run: ruff check backend
+      - run: ruff format --check backend
       - run: pip-audit -r backend/requirements.txt
-      - run: pytest -q
-      - run: python -m app.evaluate --output ../evaluation/demo-report.json
+      - run: pytest -q backend
+      - run: python -m app.evaluate --output evaluation/demo-report.json
         working-directory: backend
       - uses: actions/upload-artifact@v4
         with:
           name: demo-evaluation
-          path: evaluation/demo-report.json
+          path: backend/evaluation/demo-report.json
   frontend:
     runs-on: ubuntu-latest
     steps:
@@ -40,13 +40,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker compose build
-      - run: APP_MODE=demo docker compose up -d --wait
+      - run: docker compose -f docker/compose.yaml build
+      - run: APP_MODE=demo docker compose -f docker/compose.yaml up -d --wait
       - run: |
           curl --fail http://127.0.0.1:5173/
           curl --fail http://127.0.0.1:5173/api/health
-          docker compose exec -T backend python -c "import os; from pathlib import Path; assert os.getuid() != 0; assert os.access(Path('/app/backend/logs'), os.W_OK)"
+          docker compose -f docker/compose.yaml exec -T backend python -c "import os; from pathlib import Path; assert os.getuid() != 0; assert os.access(Path('/app/backend/logs'), os.W_OK)"
       - if: failure()
-        run: docker compose logs
+        run: docker compose -f docker/compose.yaml logs
       - if: always()
-        run: docker compose down -v
+        run: docker compose -f docker/compose.yaml down -v

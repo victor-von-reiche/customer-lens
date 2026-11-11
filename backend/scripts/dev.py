@@ -9,7 +9,7 @@ import sys
 import venv
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def install_if_changed(command, cwd, inputs, stamp):

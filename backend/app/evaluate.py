@@ -13,7 +13,7 @@ from app.config import settings
 from app.rag.vectorstore import CompanyKnowledgeBase
 from app.services.classification import DemoProvider, LiveProvider
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 
 
 async def evaluate(mode, limit=None, knowledge=None):

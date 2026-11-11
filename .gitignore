@@ -72,8 +72,7 @@ chroma_data/
 *.db-wal
 *.db-shm
 .ruff_cache/
-policies/.chroma/
-evaluation/live-report.json
+backend/policies/.chroma/
 
 # Environment overrides and rotated runtime logs
 .env.*
@@ -83,6 +82,4 @@ evaluation/live-report.json
 backend/logs/
 
 # Generated evaluation reports
-evaluation/classification-live-report.json
-evaluation/demo-report.json
-evaluation/live-smoke-report.json
+backend/evaluation/*-report.json

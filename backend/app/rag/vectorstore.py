@@ -10,7 +10,7 @@ from pathlib import Path
 
 from app.api.schemas import Source
 
-POLICY_PATH = Path(__file__).resolve().parents[3] / "policies/support.json"
+POLICY_PATH = Path(__file__).resolve().parents[2] / "policies/support.json"
 STOP_WORDS = {
     "the",
     "and",

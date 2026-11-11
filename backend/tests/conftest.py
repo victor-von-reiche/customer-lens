@@ -8,13 +8,14 @@ os.environ["ADMIN_API_TOKEN"] = ""
 os.environ["RAG_BACKEND"] = "lexical"
 
 import pytest
-from app.database.db import get_db
-from app.main import app, request_times
-from app.models.feedback import Base
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+
+from app.database.db import get_db
+from app.main import app, request_times
+from app.models.feedback import Base
 
 
 @pytest.fixture
